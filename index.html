@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Imperial Arcade — Demo Fictícia</title>
+  <style>
+    :root {
+      --bg: #0d0608;
+      --surface: #1b0a0f;
+      --card: #280e16;
+      --red: #e62e4d;
+      --gold: #ffcc4d;
+      --gold-dark: #b8860b;
+      --text: #fff7f8;
+      --muted: #b89aa1;
+    }
+
+    * {
+      box-sizing: border-box;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #3b0d1b 0%, var(--bg) 70%);
+      color: var(--text);
+      display: flex;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 440px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    /* Cabeçalho */
+    .header {
+      background: var(--surface);
+      border: 1px solid rgba(255, 204, 77, 0.25);
+      border-radius: 18px;
+      padding: 14px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: 0.5px;
+      color: var(--gold);
+    }
+
+    .logo span {
+      display: block;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--muted);
+      letter-spacing: 1px;
+    }
+
+    .wallet {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 204, 77, 0.12);
+      border: 1px solid rgba(255, 204, 77, 0.35);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+      color: var(--gold);
+      font-size: 14px;
+    }
+
+    .btn-mini {
+      background: var(--gold);
+      color: #1b0a0f;
+      border: none;
+      border-radius: 999px;
+      padding: 3px 8px;
+      font-size: 11px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    /* Banner */
+    .banner {
+      background: linear-gradient(135deg, #6e1125, #2b0912);
+      border: 1px solid rgba(255, 204, 77, 0.3);
+      border-radius: 18px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .banner h2 {
+      margin: 0 0 4px;
+      font-size: 18px;
+      color: var(--gold);
+    }
+
+    .banner p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--text);
+      opacity: 0.85;
+    }
+
+    .banner-icon {
+      font-size: 40px;
+    }
+
+    /* Abas fictícias */
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .tab {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: var(--muted);
+      padding: 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: linear-gradient(135deg, var(--red), #a81832);
+      color: #fff;
+      border-color: var(--gold);
+    }
+
+    /* Área principal do jogo 3x3 */
+    .stage {
+      background: var(--surface);
+      border: 1px solid rgba(255, 204, 77, 0.25);
+      border-radius: 20px;
+      padding: 18px;
+      text-align: center;
+    }
+
+    .stage-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--gold);
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .grid-3x3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      background: #100508;
+      padding: 10px;
+      border-radius: 16px;
+      border: 1px solid rgba(255, 204, 77, 0.2);
+      margin-bottom: 14px;
+    }
+
+    .cell {
+      background: var(--card);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      height: 74px;
+      display: grid;
+      place-items: center;
+      font-size: 34px;
+      transition: transform 0.12s ease, border-color 0.2s ease;
+    }
+
+    .cell.spin {
+      transform: scale(0.93);
+      border-color: rgba(255, 204, 77, 0.45);
+    }
+
+    .cell.win {
+      border-color: var(--gold);
+      background: rgba(255, 204, 77, 0.16);
+      transform: scale(1.03);
+    }
+
+    .bet-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .bet-selector {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--card);
+      padding: 6px 10px;
+      border-radius: 12px;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .bet-selector button {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border: none;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .btn-spin {
+      flex: 1;
+      background: linear-gradient(135deg, var(--gold), #ff9f1c);
+      color: #1b0a0f;
+      border: none;
+      border-radius: 14px;
+      padding: 13px 16px;
+      font-size: 15px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(255, 204, 77, 0.25);
+    }
+
+    .btn-spin:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .msg {
+      min-height: 22px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gold);
+    }
+
+    /* Histórico rápido */
+    .history {
+      background: var(--surface);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+
+    .history h3 {
+      margin: 0 0 8px;
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    .history-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+    }
+
+    .history-item {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(0, 0, 0, 0.25);
+      padding: 6px 10px;
+      border-radius: 8px;
+    }
+
+    .plus { color: #5ce68a; font-weight: 700; }
+    .minus { color: #ff758f; }
+
+    .disclaimer {
+      text-align: center;
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.7;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="logo">
+        DRAGON LOBBY
+        <span>PROTÓTIPO FICTÍCIO</span>
+      </div>
+      <div class="wallet">
+        <span id="saldo">5.000 pts</span>
+        <button class="btn-mini" id="btnRecarregar">+5K</button>
+      </div>
+    </header>
+
+    <section class="banner">
+      <div>
+        <h2>Festival Dourado</h2>
+        <p>Alinhe 3 símbolos iguais nas linhas horizontais para pontuar.</p>
+      </div>
+      <div class="banner-icon">🐉</div>
+    </section>
+
+    <nav class="tabs">
+      <button class="tab active" data-tema="dragao">🐉 Dragão 3x3</button>
+      <button class="tab" data-tema="fortuna">🏮 Lanternas</button>
+      <button class="tab" data-tema="tigre">🐯 Tigre</button>
+    </nav>
+
+    <main class="stage">
+      <div class="stage-title" id="tituloModo">Sala Dragão Imperial</div>
+
+      <div class="grid-3x3" id="grid"></div>
+
+      <div class="bet-bar">
+        <div class="bet-selector">
+          <button id="menos">-50</button>
+          <span id="valorGiro">100 pts</span>
+          <button id="mais">+50</button>
+        </div>
+        <button class="btn-spin" id="btnGirar">GIRAR AGORA</button>
+      </div>
+
+      <div class="msg" id="mensagem">Escolha os pontos fictícios e toque em Girar.</div>
+    </main>
+
+    <section class="history">
+      <h3>Últimas rodadas simuladas</h3>
+      <div class="history-list" id="historico">
+        <div class="history-item">
+          <span>Sessão iniciada</span>
+          <span class="plus">5.000 pts</span>
+        </div>
+      </div>
+    </section>
+
+    <div class="disclaimer">
+      Interface fictícia criada para estudo visual — sem dinheiro real, depósitos ou saques.
+    </div>
+  </div>
+
+  <script>
+    const temas = {
+      dragao: {
+        titulo: "Sala Dragão Imperial",
+        simbolos: ["🐉", "🪙", "🧧", "🏮", "💎"]
+      },
+      fortuna: {
+        titulo: "Sala Lanternas da Sorte",
+        simbolos: ["🏮", "🎆", "🎐", "🪙", "🌸"]
+      },
+      tigre: {
+        titulo: "Sala Tigre Dourado",
+        simbolos: ["🐯", "🍊", "🧧", "🪙", "👑"]
+      }
+    };
+
+    let temaAtual = "dragao";
+    let saldo = 5000;
+    let custoGiro = 100;
+
+    const elGrid = document.getElementById("grid");
+    const elSaldo = document.getElementById("saldo");
+    const elValorGiro = document.getElementById("valorGiro");
+    const elMensagem = document.getElementById("mensagem");
+    const elHistorico = document.getElementById("historico");
+    const elTituloModo = document.getElementById("tituloModo");
+    const btnGirar = document.getElementById("btnGirar");
+
+    function criarGrade() {
+      elGrid.innerHTML = "";
+      const lista = temas[temaAtual].simbolos;
+      for (let i = 0; i < 9; i++) {
+        const div = document.createElement("div");
+        div.className = "cell";
+        div.textContent = lista[i % lista.length];
+        elGrid.appendChild(div);
+      }
+    }
+
+    function atualizarUI() {
+      elSaldo.textContent = `${saldo.toLocaleString("pt-BR")} pts`;
+      elValorGiro.textContent = `${custoGiro} pts`;
+    }
+
+    function adicionarHistorico(texto, valor, positivo) {
+      const item = document.createElement("div");
+      item.className = "history-item";
+      item.innerHTML = `<span>${texto}</span><span class="${positivo ? "plus" : "minus"}">${valor}</span>`;
+      elHistorico.prepend(item);
+      if (elHistorico.children.length > 4) {
+        elHistorico.lastElementChild.remove();
+      }
+    }
+
+    document.querySelectorAll(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+        temaAtual = tab.dataset.tema;
+        elTituloModo.textContent = temas[temaAtual].titulo;
+        criarGrade();
+      });
+    });
+
+    document.getElementById("menos").addEventListener("click", () => {
+      if (custoGiro > 50) {
+        custoGiro -= 50;
+        atualizarUI();
+      }
+    });
+
+    document.getElementById("mais").addEventListener("click", () => {
+      if (custoGiro < 500) {
+        custoGiro += 50;
+        atualizarUI();
+      }
+    });
+
+    document.getElementById("btnRecarregar").addEventListener("click", () => {
+      saldo += 5000;
+      atualizarUI();
+      elMensagem.textContent = "Recarga fictícia de +5.000 pts adicionada!";
+      adicionarHistorico("Recarga demo", "+5.000 pts", true);
+    });
+
+    btnGirar.addEventListener("click", () => {
+      if (saldo < custoGiro) {
+        elMensagem.textContent = "Saldo fictício insuficiente. Toque em +5K no topo!";
+        return;
+      }
+
+      saldo -= custoGiro;
+      atualizarUI();
+      btnGirar.disabled = true;
+      elMensagem.textContent = "Girando símbolos...";
+
+      const celulas = Array.from(document.querySelectorAll(".cell"));
+      celulas.forEach((c) => {
+        c.classList.remove("win");
+        c.classList.add("spin");
+      });
+
+      const simbolos = temas[temaAtual].simbolos;
+      let passos = 0;
+
+      const timer = setInterval(() => {
+        celulas.forEach((c) => {
+          c.textContent = simbolos[Math.floor(Math.random() * simbolos.length)];
+        });
+        passos++;
+
+        if (passos >= 10) {
+          clearInterval(timer);
+          celulas.forEach((c) => c.classList.remove("spin"));
+
+          const linhas = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8]
+          ];
+
+          let linhasVencedoras = 0;
+          linhas.forEach(([a, b, c]) => {
+            if (
+              celulas[a].textContent === celulas[b].textContent &&
+              celulas[b].textContent === celulas[c].textContent
+            ) {
+              linhasVencedoras++;
+              celulas[a].classList.add("win");
+              celulas[b].classList.add("win");
+              celulas[c].classList.add("win");
+            }
+          });
+
+          if (linhasVencedoras > 0) {
+            const ganho = custoGiro * 4 * linhasVencedoras;
+            saldo += ganho;
+            elMensagem.textContent = `Linha completa! +${ganho.toLocaleString("pt-BR")} pontos fictícios!`;
+            adicionarHistorico(`${linhasVencedoras} linha(s) na ${temas[temaAtual].titulo}`, `+${ganho} pts`, true);
+          } else {
+            elMensagem.textContent = "Nenhuma linha alinhada desta vez.";
+            adicionarHistorico(`Giro (${temas[temaAtual].titulo})`, `-${custoGiro} pts`, false);
+          }
+
+          atualizarUI();
+          btnGirar.disabled = false;
+        }
+      }, 75);
+    });
+
+    criarGrade();
+    atualizarUI();
+  </script>
+</body>
+  </html>
